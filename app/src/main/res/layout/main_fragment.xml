@@ -7,14 +7,116 @@
     android:layout_height="match_parent"
     tools:context=".ui.main.MainFragment">
 
-    <TextView
-        android:id="@+id/message"
+    <View
+        android:id="@+id/topPanelView"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="MainFragment"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:background="@color/blue_500"
+        android:layout_height="56dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/temperatureMainView"
+        android:layout_width="wrap_content"
+        android:layout_height="144dp"
+        android:background="@color/green_200"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/topPanelView" />
+
+    <TextView
+        android:id="@+id/cityTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:textColor="@color/black"
+        android:layout_marginTop="24dp"
+        android:textSize="@dimen/city_names_text_size"
+        android:text="Petrozavodsk"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/topPanelView" />
+
+    <TextView
+        android:id="@+id/temperatureTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:text="77°"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:textSize="@dimen/units_text_size"
+        app:layout_constraintBottom_toBottomOf="@+id/temperatureMainView"
+        app:layout_constraintStart_toStartOf="@+id/temperatureMainView"
+        app:layout_constraintTop_toBottomOf="@+id/cityTextView" />
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/unitsSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/celsiusUnitsTextView"
+        app:layout_constraintEnd_toStartOf="@+id/celsiusUnitsTextView"
+        app:layout_constraintTop_toTopOf="@+id/celsiusUnitsTextView" />
+
+    <TextView
+        android:textColor="@color/black"
+        android:id="@+id/fahrenheitUnitsTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/fahrenheit"
+        android:textSize="@dimen/unit_names_text_size"
+        app:layout_constraintBottom_toBottomOf="@+id/unitsSwitch"
+        app:layout_constraintEnd_toStartOf="@+id/unitsSwitch"
+        app:layout_constraintTop_toTopOf="@+id/unitsSwitch" />
+
+    <TextView
+        android:textColor="@color/black"
+        android:id="@+id/celsiusUnitsTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="24dp"
+        android:text="@string/celsius"
+        android:textSize="@dimen/unit_names_text_size"
+        app:layout_constraintBottom_toBottomOf="@+id/temperatureTextView"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageButton
+        android:id="@+id/searchImageButton"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:background="@null"
+        android:foregroundTint="@color/white"
+        android:src="@drawable/ic_search_black_24dp"
+        app:layout_constraintBottom_toBottomOf="@+id/topPanelView"
+        app:layout_constraintEnd_toStartOf="@+id/nearMeImageButton"
+        app:layout_constraintTop_toTopOf="@+id/topPanelView"
+        app:tint="@color/white"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <ImageButton
+        android:id="@+id/nearMeImageButton"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:background="@null"
+        android:foregroundTint="@color/white"
+        android:src="@drawable/ic_near_me_black_24dp"
+        app:layout_constraintBottom_toBottomOf="@+id/topPanelView"
+        app:layout_constraintEnd_toEndOf="@+id/topPanelView"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/white"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/weatherRecycleView"
+        android:background="@color/gray_300"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="2dp"
+        android:layout_marginBottom="2dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/temperatureMainView" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
