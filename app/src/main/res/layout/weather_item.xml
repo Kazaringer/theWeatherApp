@@ -6,10 +6,11 @@
     android:layout_height="match_parent"
     android:maxHeight="78dp">
 
-    <TextView
+    <include
         android:id="@+id/cityAndTemperatureTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        layout="@layout/temperature_view"
         android:layout_marginStart="24dp"
         android:layout_marginTop="8dp"
         android:textStyle="bold"

@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import com.example.theweather.presentation.di.ApplicationComponent
 import com.example.theweather.presentation.di.DaggerApplicationComponent
+import io.realm.Realm
 
 class MainApplication : Application() {
 
@@ -12,6 +13,7 @@ class MainApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         applicationComponent = DaggerApplicationComponent.create()
+        Realm.init(this)
     }
 }
 

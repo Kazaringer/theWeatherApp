@@ -5,8 +5,8 @@ import com.example.theweather.presentation.MainFragment.MainFragment
 import dagger.Component
 import javax.inject.Singleton
 
-
-@Component(modules = [ApplicationModule::class, ApplicationBindModule::class])
+@Singleton
+@Component(modules = [ApplicationModule::class, ApplicationBindModule::class, NetworkModule::class, DBModule::class])
 interface ApplicationComponent {
     fun inject(mainActivity: MainActivity)
     fun inject(mainActivity: MainFragment)
