@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:theme="@style/Theme.TheWeather"
+    android:background="?attr/colorPrimary">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end">
+
+        <ImageButton
+            android:id="@+id/searchImageButton"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:background="?android:selectableItemBackground"
+            android:src="@drawable/ic_search_black_24dp" />
+
+        <ImageButton
+            android:id="@+id/nearMeImageButton"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:background="?android:selectableItemBackground"
+            android:src="@drawable/ic_near_me_black_24dp" />
+    </LinearLayout>
+</Toolbar>

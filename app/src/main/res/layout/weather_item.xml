@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:maxHeight="78dp">
+    android:layout_height="match_parent">
 
     <include
         android:id="@+id/cityAndTemperatureTextView"
@@ -13,10 +11,6 @@
         layout="@layout/temperature_view"
         android:layout_marginStart="24dp"
         android:layout_marginTop="8dp"
-        android:textStyle="bold"
-        android:textColor="@color/black"
-        android:text="Petrozavodsk, 77°F"
-        android:textSize="@dimen/weather_item_text_size"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -38,11 +32,10 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="24dp"
         android:background="@null"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/splitterView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_leaderboard_black_24dp" />
-
 
 
     <View
@@ -50,11 +43,27 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:background="@android:color/darker_gray"
         android:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dateTextView" />
+
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/weatherGraph"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/splitterView" />
+
+
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

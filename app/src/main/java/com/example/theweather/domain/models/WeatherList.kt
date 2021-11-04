@@ -5,16 +5,17 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.example.theweather.data.storage.Models.NetworkModels.Weather
 
-class WeatherList() {
-    var preview = MutableLiveData<WeatherModel>()
+class WeatherList {
+    private var previewMutable = MutableLiveData<WeatherModel>()
+    var preview: LiveData<WeatherModel> = previewMutable
 
-    private val weatherModels: MutableList<WeatherModel> = mutableListOf()
+     val weatherModels: MutableList<WeatherModel> = mutableListOf()
     val iterator: MutableIterator<WeatherModel> = weatherModels.iterator()
 
 
     fun addModel(weatherModel: WeatherModel) {
-        if (preview.value == null || preview.value!!.dateTime < weatherModel.dateTime)
-            preview.value = weatherModel
+        if (previewMutable.value == null || previewMutable.value!!.dateTime < weatherModel.dateTime)
+            previewMutable.value = weatherModel
 
         weatherModels.add(weatherModel)
     }
@@ -22,6 +23,4 @@ class WeatherList() {
     fun sort() {
         weatherModels.sortBy { it.dateTime }
     }
-
-
 }

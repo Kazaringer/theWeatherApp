@@ -4,8 +4,6 @@ import dagger.Module
 import dagger.Provides
 import io.realm.Realm
 import io.realm.RealmConfiguration
-import io.realm.annotations.Index
-import javax.inject.Singleton
 import io.realm.exceptions.RealmMigrationNeededException
 import java.lang.Exception
 import javax.inject.Inject

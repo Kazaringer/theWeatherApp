@@ -1,5 +1,7 @@
 package com.example.theweather.data.repository
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.example.theweather.data.storage.CurrentWeatherProvider
 import com.example.theweather.data.storage.WeatherStorage
 import com.example.theweather.domain.models.WeatherModel
@@ -13,21 +15,31 @@ class WeatherRepositoryImpl @Inject constructor(
     val weatherStorage: WeatherStorage
 ) : WeatherRepository {
 
-    override suspend fun getWeatherModels(): List<WeatherModel> {
-        val storageWeatherModels = coroutineScope { weatherStorage.get() }
+    private val weatherList = mutableListOf<WeatherModel>()
+    private val weatherListLiveData = MutableLiveData<List<WeatherModel>>()
 
-        val weatherModels = mutableListOf<WeatherModel>()
+    override suspend fun getWeatherModels(): LiveData<List<WeatherModel>> {
 
-        for (storageWeatherModel in storageWeatherModels) {
-            weatherModels.add(convertModels(storageWeatherModel))
+        if (weatherListLiveData.value != null) {
+            return weatherListLiveData
         }
 
-        return weatherModels
+        val storageWeatherModels = coroutineScope { weatherStorage.get() }
+
+        for (storageWeatherModel in storageWeatherModels) {
+            weatherList.add(convertModels(storageWeatherModel))
+        }
+
+        weatherListLiveData.value = weatherList;
+
+        return weatherListLiveData
     }
 
     override suspend fun saveWeatherModel(weatherModel: WeatherModel) {
         val storageWeatherModel = convertModels(weatherModel);
         weatherStorage.set(storageWeatherModel)
+        weatherList.add(weatherModel)
+        weatherListLiveData.value = weatherList;
     }
 
     override suspend fun getCurrentWeatherModel(): WeatherModel {

@@ -1,22 +1,22 @@
-package com.example.theweather.presentation.MainFragment
+package com.example.theweather.presentation.citiesListFragment
 
-import android.opengl.Visibility
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.example.theweather.R
-import com.example.theweather.domain.models.WeatherModel
+import com.example.theweather.domain.models.WeatherList
 import com.example.theweather.utils.TemperatureUtils
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import java.text.SimpleDateFormat
 
+
 class WeatherRecycleViewAdapter @AssistedInject constructor(
-    @Assisted private val dataSet: List<WeatherModel>,
+    @Assisted private val dataSet: List<WeatherList>,
 ) :
     RecyclerView.Adapter<WeatherRecycleViewAdapter.WeatherViewHolder>() {
 
@@ -30,7 +30,8 @@ class WeatherRecycleViewAdapter @AssistedInject constructor(
         var cityAndFahrenheitTextView: TextView? = null
         var cityAndCelsiusTextView: TextView? = null
         var dateTextView: TextView? = null
-
+        var temperatureUnitsType: TemperatureUtils.TemperatureUnitsType =
+            TemperatureUtils.TemperatureUnitsType.FAHRENHEIT
 
         init {
             cityAndFahrenheitTextView = itemView.findViewById(R.id.cityAndFahrenheitTextView)
@@ -39,14 +40,17 @@ class WeatherRecycleViewAdapter @AssistedInject constructor(
         }
 
         fun setCelsiusView() {
+            temperatureUnitsType = TemperatureUtils.TemperatureUnitsType.CELSIUS
             cityAndFahrenheitTextView?.visibility = View.INVISIBLE
             cityAndCelsiusTextView?.visibility = View.VISIBLE
         }
 
         fun setFahrenheitView() {
+            temperatureUnitsType = TemperatureUtils.TemperatureUnitsType.FAHRENHEIT
             cityAndFahrenheitTextView?.visibility = View.VISIBLE
             cityAndCelsiusTextView?.visibility = View.INVISIBLE
         }
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WeatherViewHolder {
@@ -58,10 +62,13 @@ class WeatherRecycleViewAdapter @AssistedInject constructor(
 
     override fun onBindViewHolder(holder: WeatherViewHolder, position: Int) {
         val data = dataSet[position]
+        val weatherPreview = data.preview;
 
-        holder.cityAndFahrenheitTextView?.text = "${data.city}, ${data.temperatureFahrenheit}°F"
-        holder.cityAndCelsiusTextView?.text = "${data.city}, ${data.temperatureCelsius}°C"
-        holder.dateTextView?.text = "${dateFormat.format(data.dateTime)}"
+        weatherPreview.observe(holder.itemView.context as LifecycleOwner, {
+            holder.cityAndFahrenheitTextView?.text = "${it.city}, ${it.temperatureFahrenheit}°F"
+            holder.cityAndCelsiusTextView?.text = "${it.city}, ${it.temperatureCelsius}°C"
+            holder.dateTextView?.text = "${dateFormat.format(it.dateTime)}"
+        })
 
         when (selectedTemperatureUnitsType) {
             TemperatureUtils.TemperatureUnitsType.CELSIUS -> holder.setCelsiusView()
@@ -94,8 +101,6 @@ class WeatherRecycleViewAdapter @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(
-            @Assisted dataSet: List<WeatherModel>
-        ): WeatherRecycleViewAdapter
+        fun create(@Assisted dataSet: List<WeatherList>): WeatherRecycleViewAdapter
     }
 }
