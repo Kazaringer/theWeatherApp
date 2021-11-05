@@ -2,8 +2,8 @@ package com.example.theweather.presentation
 
 import android.app.Application
 import android.content.Context
-import com.example.theweather.presentation.di.ApplicationComponent
-import com.example.theweather.presentation.di.DaggerApplicationComponent
+import com.example.theweather.di.ApplicationComponent
+import com.example.theweather.di.DaggerApplicationComponent
 import io.realm.Realm
 
 class MainApplication : Application() {

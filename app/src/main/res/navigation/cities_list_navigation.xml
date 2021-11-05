@@ -2,10 +2,22 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cities_list_navigation"
-    app:startDestination="@id/citiesListFragment">
-
+    app:startDestination="@id/weatherByCityListFragment">
     <fragment
-        android:id="@+id/citiesListFragment"
-        android:name="com.example.theweather.presentation.citiesListFragment.CitiesListFragment"
-        android:label="CitiesListFragment" />
+        android:id="@+id/weatherByCityListFragment"
+        android:name="com.example.theweather.presentation.weatherByCityListFragment.WeatherByCityListFragment"
+        android:label="WeatherByCityListFragment" >
+        <action
+            android:id="@+id/action_weatherByCityListFragment_to_chartFragment"
+            app:destination="@id/chartFragment"
+            app:popUpTo="@id/weatherByCityListFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/chartFragment"
+        android:name="com.example.theweather.presentation.chartFragment.ChartFragment"
+        android:label="ChartFragment" >
+        <argument
+            android:name="weatherList"
+            app:argType="com.example.theweather.domain.models.WeatherList" />
+    </fragment>
 </navigation>

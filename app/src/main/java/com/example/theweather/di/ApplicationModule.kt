@@ -1,9 +1,9 @@
-package com.example.theweather.presentation.di
+package com.example.theweather.di
 
 import com.example.theweather.data.repository.WeatherRepositoryImpl
-import com.example.theweather.data.storage.NetworkWeatherProvider
 import com.example.theweather.data.storage.CurrentWeatherProvider
 import com.example.theweather.data.storage.LocalWeatherStorage
+import com.example.theweather.data.storage.NetworkWeatherProvider
 import com.example.theweather.data.storage.WeatherStorage
 import com.example.theweather.domain.repository.WeatherRepository
 import dagger.Binds

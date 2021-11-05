@@ -3,10 +3,13 @@ package com.example.theweather.presentation
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.example.theweather.R
+import com.example.theweather.presentation.mainFragment.MainFragment
+import dagger.Lazy
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
 
-   // @Inject
+ //  @Inject
    // lateinit var mainFragment: Lazy<MainFragment>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -15,10 +18,10 @@ class MainActivity : AppCompatActivity() {
 
         applicationComponent.inject(this)
 
-        if (savedInstanceState == null) {
-           // supportFragmentManager.beginTransaction()
-               // .replace(R.id.container, mainFragment.get())
-              //  .commitNow()
-        }
+   /*     if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.mainFragmentContainer, mainFragment.get())
+                .commitNow()
+        }*/
     }
 }

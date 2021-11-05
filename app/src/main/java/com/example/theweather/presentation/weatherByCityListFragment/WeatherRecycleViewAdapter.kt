@@ -1,13 +1,16 @@
-package com.example.theweather.presentation.citiesListFragment
+package com.example.theweather.presentation.weatherByCityListFragment
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
+import androidx.navigation.NavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.theweather.R
 import com.example.theweather.domain.models.WeatherList
+import com.example.theweather.utils.DebugConsole
 import com.example.theweather.utils.TemperatureUtils
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -17,6 +20,7 @@ import java.text.SimpleDateFormat
 
 class WeatherRecycleViewAdapter @AssistedInject constructor(
     @Assisted private val dataSet: List<WeatherList>,
+    @Assisted private val navController: NavController
 ) :
     RecyclerView.Adapter<WeatherRecycleViewAdapter.WeatherViewHolder>() {
 
@@ -24,7 +28,7 @@ class WeatherRecycleViewAdapter @AssistedInject constructor(
     private var selectedTemperatureUnitsType: TemperatureUtils.TemperatureUnitsType =
         TemperatureUtils.TemperatureUnitsType.FAHRENHEIT
 
-    val dateFormat = SimpleDateFormat("dd/M/yyyy hh:mm:ss")
+    private val dateFormat = SimpleDateFormat("dd/M/yyyy hh:mm:ss")
 
     class WeatherViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var cityAndFahrenheitTextView: TextView? = null
@@ -74,7 +78,20 @@ class WeatherRecycleViewAdapter @AssistedInject constructor(
             TemperatureUtils.TemperatureUnitsType.CELSIUS -> holder.setCelsiusView()
             else -> holder.setFahrenheitView()
         }
+
+        setupButtons(holder.itemView, data)
         viewHolders.add(holder)
+    }
+
+    private fun setupButtons(view: View, weatherList: WeatherList) {
+        val chartButton = view.findViewById<ImageButton>(R.id.chartButton)
+        chartButton.setOnClickListener {
+            val action =
+                WeatherByCityListFragmentDirections.actionWeatherByCityListFragmentToChartFragment(
+                    weatherList
+                )
+            navController.navigate(action)
+        }
     }
 
     override fun onViewRecycled(holder: WeatherViewHolder) {
@@ -101,6 +118,9 @@ class WeatherRecycleViewAdapter @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(@Assisted dataSet: List<WeatherList>): WeatherRecycleViewAdapter
+        fun create(
+            @Assisted dataSet: List<WeatherList>,
+            navController: NavController
+        ): WeatherRecycleViewAdapter
     }
 }

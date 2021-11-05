@@ -9,7 +9,7 @@ import java.util.*
 import javax.inject.Inject
 
 class GetSavedWeatherModelsUseCase @Inject constructor(private val weatherRepository: WeatherRepository) {
-   suspend fun execute(): LiveData<List<WeatherModel>> {
+    suspend fun execute(): LiveData<List<WeatherModel>> {
         return weatherRepository.getWeatherModels()
     }
 }

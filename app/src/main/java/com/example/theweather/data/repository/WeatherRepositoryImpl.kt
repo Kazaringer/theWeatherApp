@@ -2,48 +2,58 @@ package com.example.theweather.data.repository
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.liveData
 import com.example.theweather.data.storage.CurrentWeatherProvider
 import com.example.theweather.data.storage.WeatherStorage
 import com.example.theweather.domain.models.WeatherModel
 import com.example.theweather.domain.repository.WeatherRepository
-import com.example.theweather.utils.TemperatureUtils
-import kotlinx.coroutines.coroutineScope
+import com.example.theweather.utils.DebugConsole
+import kotlinx.coroutines.*
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class WeatherRepositoryImpl @Inject constructor(
-    val networkWeatherProvider: CurrentWeatherProvider,
-    val weatherStorage: WeatherStorage
+    private val weatherProvider: CurrentWeatherProvider,
+    private val weatherStorage: WeatherStorage
 ) : WeatherRepository {
 
     private val weatherList = mutableListOf<WeatherModel>()
-    private val weatherListLiveData = MutableLiveData<List<WeatherModel>>()
+    private var weatherListLiveData = MutableLiveData<List<WeatherModel>>()
 
-    override suspend fun getWeatherModels(): LiveData<List<WeatherModel>> {
+    override suspend fun getWeatherModels(): LiveData<List<WeatherModel>> =
+        coroutineScope {
+            if (weatherListLiveData.value != null) {
+                return@coroutineScope weatherListLiveData
+            }
 
-        if (weatherListLiveData.value != null) {
-            return weatherListLiveData
+            val storageWeatherModels = async { weatherStorage.get() }
+
+            launch(Dispatchers.Main) {
+                for (storageWeatherModel in storageWeatherModels.await()) {
+                    weatherList.add(convertModels(storageWeatherModel))
+                }
+
+                weatherListLiveData.value = weatherList
+            }
+
+            return@coroutineScope weatherListLiveData
         }
 
-        val storageWeatherModels = coroutineScope { weatherStorage.get() }
-
-        for (storageWeatherModel in storageWeatherModels) {
-            weatherList.add(convertModels(storageWeatherModel))
-        }
-
-        weatherListLiveData.value = weatherList;
-
-        return weatherListLiveData
-    }
 
     override suspend fun saveWeatherModel(weatherModel: WeatherModel) {
-        val storageWeatherModel = convertModels(weatherModel);
+        val storageWeatherModel = convertModels(weatherModel)
         weatherStorage.set(storageWeatherModel)
         weatherList.add(weatherModel)
-        weatherListLiveData.value = weatherList;
+        coroutineScope {
+            launch(Dispatchers.Main) {
+                weatherListLiveData.value = weatherList;
+            }
+        }
     }
 
     override suspend fun getCurrentWeatherModel(): WeatherModel {
-        val weatherModel = networkWeatherProvider.provide()
+        val weatherModel = weatherProvider.provide()
         return convertModels(weatherModel)
     }
 

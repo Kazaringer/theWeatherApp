@@ -4,8 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.example.theweather.data.storage.Models.NetworkModels.Weather
+import java.io.Serializable
 
-class WeatherList {
+class WeatherList : Serializable {
     private var previewMutable = MutableLiveData<WeatherModel>()
     var preview: LiveData<WeatherModel> = previewMutable
 

@@ -3,6 +3,7 @@ plugins {
     id 'kotlin-android'
     id 'kotlin-kapt'
     id 'realm-android'
+    id 'androidx.navigation.safeargs.kotlin'
 }
 
 android {
@@ -35,7 +36,6 @@ android {
 realm {
     syncEnabled = true
 }
-
 
 
 def daggerVersion = "2.36"
@@ -81,9 +81,9 @@ dependencies {
     // Feature module Support
     implementation "androidx.navigation:navigation-dynamic-features-fragment:$nav_version"
 
-    dependencies {
-        implementation(dagger)
-        kapt(daggerCompiler)
-    }
+
+    implementation(dagger)
+    kapt(daggerCompiler)
+
 }
 

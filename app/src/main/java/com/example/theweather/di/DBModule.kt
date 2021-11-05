@@ -1,4 +1,4 @@
-package com.example.theweather.presentation.di
+package com.example.theweather.di
 
 import dagger.Module
 import dagger.Provides

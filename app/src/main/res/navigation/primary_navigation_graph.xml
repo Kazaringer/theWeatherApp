@@ -2,7 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/navigation_graph"
+    android:id="@+id/primary_navigation_graph"
     app:startDestination="@id/mainFragment">
 
     <fragment
@@ -11,11 +11,9 @@
         android:label="main_fragment"
         tools:layout="@layout/main_fragment" >
         <action
-            android:id="@+id/action_mainFragment_to_chartFragment"
-            app:destination="@id/chartFragment" />
+            android:id="@+id/action_mainFragment_to_cities_list_navigation"
+            app:destination="@id/cities_list_navigation"
+            app:popUpTo="@id/cities_list_navigation" />
     </fragment>
-    <fragment
-        android:id="@+id/chartFragment"
-        android:name="com.example.theweather.presentation.chartFragment.ChartFragment"
-        android:label="ChartFragment" />
+    <include app:graph="@navigation/cities_list_navigation" />
 </navigation>

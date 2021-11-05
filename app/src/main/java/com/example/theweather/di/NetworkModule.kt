@@ -1,4 +1,4 @@
-package com.example.theweather.presentation.di
+package com.example.theweather.di
 
 import com.example.theweather.data.services.NetworkWeatherService
 import dagger.Module

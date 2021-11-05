@@ -37,18 +37,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolBar" />
 
-    <TextView
+
+
+    <include
         android:id="@+id/temperatureTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        layout="@layout/temperature_main_layout"
         android:layout_marginStart="24dp"
-        android:text="77°"
-        android:textColor="?attr/colorOnSecondary"
-        android:textSize="@dimen/units_text_size"
-        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/temperatureMainView"
         app:layout_constraintStart_toStartOf="@+id/temperatureMainView"
         app:layout_constraintTop_toBottomOf="@+id/cityTextView" />
+
 
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/unitsSwitch"
@@ -81,8 +81,8 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
 
-    <fragment
-        android:id="@+id/navigation_host_fragment"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/secondary_navigation_host_fragment"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -91,7 +91,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/temperatureMainView"
-        app:navGraph="@navigation/cities_list_navigation" />
+        app:navGraph="@navigation/cities_list_navigation"
+        tools:layout="@layout/weather_by_city_list_fragment" />
 
 
     <Button

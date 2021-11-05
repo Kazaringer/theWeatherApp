@@ -2,7 +2,7 @@ package com.example.theweather.data.storage
 
 import com.example.theweather.data.storage.Models.RealmWeatherModel
 import com.example.theweather.data.storage.Models.WeatherModel
-import com.example.theweather.presentation.di.DBModule
+import com.example.theweather.di.DBModule
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.kotlin.executeTransactionAwait
