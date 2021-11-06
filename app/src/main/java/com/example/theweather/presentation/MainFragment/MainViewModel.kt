@@ -2,7 +2,6 @@ package com.example.theweather.presentation.mainFragment
 
 import androidx.lifecycle.*
 import com.example.theweather.domain.controllers.SelectedWeatherProvider
-import com.example.theweather.domain.models.WeatherList
 import com.example.theweather.domain.models.WeatherModel
 import com.example.theweather.domain.usecase.AddNewWeatherModelUseCase
 import com.example.theweather.domain.usecase.ChangeCurrentTemperatureUnitsTypeUseCase
@@ -15,7 +14,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class MainViewModel constructor(
-    private val getCurrentWeatherModelUseCase: GetCurrentWeatherModelUseCase,
+    private val getCurrentWeatherModelByCoordinatesUseCase: GetCurrentWeatherModelUseCase,
     private val addNewWeatherModelUseCase: AddNewWeatherModelUseCase,
     private val changeCurrentTemperatureUnitsTypeUseCase: ChangeCurrentTemperatureUnitsTypeUseCase,
     private val selectedWeatherProvider: SelectedWeatherProvider
@@ -31,10 +30,10 @@ class MainViewModel constructor(
         changeCurrentTemperatureUnitsTypeUseCase.execute(TemperatureUtils.TemperatureUnitsType.FAHRENHEIT)
     }
 
-    fun getCurrentWeather() {
+    fun getWeatherByCoordinates(latitude: Double, longitude: Double) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val currentWeather = getCurrentWeatherAsync()
+                val currentWeather = getCurrentWeatherAsync(latitude, longitude)
                 addWeatherToStorage(currentWeather)
             } catch (exception: Exception) {
                 DebugConsole.error(
@@ -45,15 +44,16 @@ class MainViewModel constructor(
         }
     }
 
-    private suspend fun getCurrentWeatherAsync(): WeatherModel {
+    private suspend fun getCurrentWeatherAsync(latitude: Double, longitude: Double): WeatherModel {
 
-        val model = viewModelScope.async(Dispatchers.IO) { getCurrentWeatherModelUseCase.execute() }
+        val model = viewModelScope.async(Dispatchers.IO) { getCurrentWeatherModelByCoordinatesUseCase.execute(latitude,longitude) }
         return model.await()
     }
 
     private fun addWeatherToStorage(weatherModel: WeatherModel) {
         addNewWeatherModelUseCase.execute(weatherModel)
     }
+
 
     class Factory @Inject constructor(
         private val getCurrentWeatherModelUseCase: GetCurrentWeatherModelUseCase,

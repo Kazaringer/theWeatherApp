@@ -9,7 +9,7 @@
 
     <include
         android:id="@+id/toolBar"
-        layout="@layout/custom_toolbar"
+        layout="@layout/custom_tool_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
@@ -38,12 +38,11 @@
         app:layout_constraintTop_toBottomOf="@+id/toolBar" />
 
 
-
     <include
         android:id="@+id/temperatureTextView"
+        layout="@layout/temperature_main_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        layout="@layout/temperature_main_layout"
         android:layout_marginStart="24dp"
         app:layout_constraintBottom_toBottomOf="@+id/temperatureMainView"
         app:layout_constraintStart_toStartOf="@+id/temperatureMainView"
@@ -93,15 +92,6 @@
         app:layout_constraintTop_toBottomOf="@+id/temperatureMainView"
         app:navGraph="@navigation/cities_list_navigation"
         tools:layout="@layout/weather_by_city_list_fragment" />
-
-
-    <Button
-        android:id="@+id/addButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Button"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/temperatureMainView" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

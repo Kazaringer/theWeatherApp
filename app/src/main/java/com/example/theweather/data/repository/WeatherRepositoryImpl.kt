@@ -76,8 +76,11 @@ class WeatherRepositoryImpl @Inject constructor(
         return weatherListByCity[city]!!
     }
 
-    override suspend fun getCurrentWeatherModel(): WeatherModel {
-        val weatherModel = weatherProvider.provide()
+    override suspend fun getCurrentWeatherModelByCoordinates(
+        latitude: Double,
+        longitude: Double
+    ): WeatherModel {
+        val weatherModel = weatherProvider.getModelByCoordinates(latitude, longitude)
         return convertModels(weatherModel)
     }
 
