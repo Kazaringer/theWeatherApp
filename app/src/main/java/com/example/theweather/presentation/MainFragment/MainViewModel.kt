@@ -51,7 +51,7 @@ class MainViewModel constructor(
         return model.await()
     }
 
-    private suspend fun addWeatherToStorage(weatherModel: WeatherModel) {
+    private fun addWeatherToStorage(weatherModel: WeatherModel) {
         addNewWeatherModelUseCase.execute(weatherModel)
     }
 

@@ -47,7 +47,7 @@ class WeatherByCityListFragment @Inject constructor() :
 
     private fun observeViewModel() {
 
-        viewModel.weatherListLiveData.observe(viewLifecycleOwner, {
+        viewModel.weatherListsLiveData.observe(viewLifecycleOwner, {
             if (adapter == null) {
                 createAdapter(it)
                 return@observe
@@ -68,7 +68,7 @@ class WeatherByCityListFragment @Inject constructor() :
         lifecycleScope.launch {
             viewModel.getWeatherModels().observe(viewLifecycleOwner, { models ->
                 if (models != null) {
-                    viewModel.updateWeatherLists(models)
+                    viewModel.updateData(models)
                 }
             })
         }

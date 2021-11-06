@@ -9,6 +9,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.example.theweather.R
+import com.example.theweather.data.storage.Models.NetworkModels.Weather
+import com.example.theweather.domain.models.WeatherList
+import com.example.theweather.domain.models.WeatherModel
+import com.example.theweather.domain.usecase.GetWeatherListByCityUseCase
 import com.example.theweather.presentation.applicationComponent
 import com.example.theweather.presentation.weatherByCityListFragment.WeatherByCityListViewModel
 import com.example.theweather.presentation.weatherByCityListFragment.WeatherRecycleViewAdapter
@@ -33,11 +37,18 @@ class ChartFragment @Inject constructor() : Fragment(R.layout.chart_fragment) {
     private val celsiusEntries: ArrayList<Entry> = ArrayList()
     private val fahrenheitEntries: ArrayList<Entry> = ArrayList()
 
-    private val celsiusLineDataSet = LineDataSet(celsiusEntries, "")
-    private val fahrenheitLineDataSet = LineDataSet(fahrenheitEntries, "")
 
-    private val celsiusLineData = LineData(celsiusLineDataSet)
-    private val fahrenheitLineData = LineData(fahrenheitLineDataSet)
+    private var currentTemperatureUnitsType: TemperatureUtils.TemperatureUnitsType =
+        TemperatureUtils.TemperatureUnitsType.FAHRENHEIT
+
+    private val entries: ArrayList<Entry>
+        get() = when (currentTemperatureUnitsType) {
+            TemperatureUtils.TemperatureUnitsType.CELSIUS ->
+                celsiusEntries
+            else ->
+                fahrenheitEntries
+        }
+
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -46,7 +57,6 @@ class ChartFragment @Inject constructor() : Fragment(R.layout.chart_fragment) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        updateEntries()
         setupGraphView(view)
         observeViewModel()
     }
@@ -68,6 +78,42 @@ class ChartFragment @Inject constructor() : Fragment(R.layout.chart_fragment) {
     }
 
     private fun observeViewModel() {
+        observeCurrentTemperatureUnitsType()
+        observeWeatherList()
+    }
+
+    private fun switchToCelsius() {
+        currentTemperatureUnitsType = TemperatureUtils.TemperatureUnitsType.CELSIUS
+        updateGraphData()
+    }
+
+    private fun switchToFahrenheit() {
+        currentTemperatureUnitsType = TemperatureUtils.TemperatureUnitsType.FAHRENHEIT
+        updateGraphData()
+    }
+
+    private fun updateGraphData() {
+        val entries = this.entries
+        if (entries.size <= 0)
+            return
+
+        val dataSet = LineDataSet(entries, "");
+        val data = LineData(dataSet)
+        lineChart?.data = data
+        lineChart?.invalidate()
+    }
+
+    private fun observeWeatherList() {
+        val cityName = args.cityName
+        val weatherList = viewModel.getWeatherList(cityName)
+        weatherList.weatherModels.observe(viewLifecycleOwner, {
+            updateEntries(it)
+            updateGraphData()
+            viewModel.onWeatherListUpdate(it)
+        })
+    }
+
+    private fun observeCurrentTemperatureUnitsType() {
         viewModel.getCurrentTemperatureUnitsType().observe(viewLifecycleOwner, {
             when (it) {
                 TemperatureUtils.TemperatureUnitsType.CELSIUS -> {
@@ -78,37 +124,16 @@ class ChartFragment @Inject constructor() : Fragment(R.layout.chart_fragment) {
         })
     }
 
-    private fun switchToCelsius() {
-        updateGraphData(celsiusEntries)
-    }
-
-    private fun switchToFahrenheit() {
-        updateGraphData(fahrenheitEntries)
-    }
-
-    private fun updateGraphData(entries: ArrayList<Entry>) {
-        val dataSet = LineDataSet(entries, "");
-        val data = LineData(dataSet)
-        lineChart?.data = data
-        lineChart?.invalidate()
-    }
-
-    private fun updateEntries() {
-
-        val weatherList = args.weatherList
-        weatherList.sort()
-        val weatherModels = weatherList.weatherModels;
-
-        if (weatherModels.size <= 0)
-            return
-
+    private fun updateEntries(weatherModels: List<WeatherModel>) {
         celsiusEntries.clear()
         fahrenheitEntries.clear()
 
-        val minTime = weatherModels[0].dateTime.time
+        val firstWeatherModel = weatherModels.minByOrNull { it.dateTime }
+        var minTime = 0f
+        firstWeatherModel?.let { minTime = it.dateTime.time.toFloat() }
 
         for (weather in weatherModels) {
-            val x = (weather.dateTime.time - minTime).toFloat()
+            val x = (weather.dateTime.time - minTime)
             val yCelsius = weather.temperatureCelsius.toFloat()
             val yFahrenheit = weather.temperatureFahrenheit.toFloat()
 

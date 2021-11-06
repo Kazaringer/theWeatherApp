@@ -6,22 +6,29 @@ import androidx.lifecycle.Observer
 import com.example.theweather.data.storage.Models.NetworkModels.Weather
 import java.io.Serializable
 
-class WeatherList : Serializable {
+class WeatherList {
+
+    val cityName: String
+        get() {
+            var name = ""
+            preview.value?.city?.let { name = it }
+            return name
+        }
+
     private var previewMutable = MutableLiveData<WeatherModel>()
     var preview: LiveData<WeatherModel> = previewMutable
 
-     val weatherModels: MutableList<WeatherModel> = mutableListOf()
-    val iterator: MutableIterator<WeatherModel> = weatherModels.iterator()
+    private val weatherModelsCache: MutableList<WeatherModel> = mutableListOf()
+    private val weatherModelsMutable: MutableLiveData<List<WeatherModel>> =
+        MutableLiveData<List<WeatherModel>>(weatherModelsCache)
+    val weatherModels: LiveData<List<WeatherModel>> = weatherModelsMutable
 
 
     fun addModel(weatherModel: WeatherModel) {
         if (previewMutable.value == null || previewMutable.value!!.dateTime < weatherModel.dateTime)
             previewMutable.value = weatherModel
 
-        weatherModels.add(weatherModel)
-    }
-
-    fun sort() {
-        weatherModels.sortBy { it.dateTime }
+        weatherModelsCache.add(weatherModel)
+        weatherModelsMutable.value = weatherModelsCache
     }
 }

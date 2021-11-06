@@ -17,7 +17,8 @@
         android:name="com.example.theweather.presentation.chartFragment.ChartFragment"
         android:label="ChartFragment" >
         <argument
-            android:name="weatherList"
-            app:argType="com.example.theweather.domain.models.WeatherList" />
+            android:name="cityName"
+            app:argType="string"
+            android:defaultValue='""' />
     </fragment>
 </navigation>

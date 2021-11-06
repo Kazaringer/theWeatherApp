@@ -8,5 +8,5 @@ data class WeatherModel(
     var temperatureFahrenheit: Double,
     var temperatureCelsius: Double,
     var dateTime: Date
-) : Serializable
+)
 

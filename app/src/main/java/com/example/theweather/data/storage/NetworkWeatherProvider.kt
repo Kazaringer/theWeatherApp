@@ -14,7 +14,7 @@ class NetworkWeatherProvider @Inject constructor(private val networkWeatherServi
     private val API_KEY = "56b1382eb3c79443540f88b7996c07d8";
 
     override suspend fun provide(): WeatherModel {
-        val networkModel = networkWeatherService.getCurrentWeather("Petrozavodsk", API_KEY)
+        val networkModel = networkWeatherService.getCurrentWeather("Agades", API_KEY)
         return convertModels(networkModel)
     }
 

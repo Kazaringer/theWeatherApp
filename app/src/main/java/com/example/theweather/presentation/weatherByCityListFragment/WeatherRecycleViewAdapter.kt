@@ -88,7 +88,7 @@ class WeatherRecycleViewAdapter @AssistedInject constructor(
         chartButton.setOnClickListener {
             val action =
                 WeatherByCityListFragmentDirections.actionWeatherByCityListFragmentToChartFragment(
-                    weatherList
+                    weatherList.cityName
                 )
             navController.navigate(action)
         }

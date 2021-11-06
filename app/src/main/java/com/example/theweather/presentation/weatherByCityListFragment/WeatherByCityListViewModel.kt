@@ -9,81 +9,69 @@ import com.example.theweather.domain.models.WeatherList
 import com.example.theweather.domain.models.WeatherModel
 import com.example.theweather.domain.usecase.GetCurrentTemperatureUnitsTypeUseCase
 import com.example.theweather.domain.usecase.GetSavedWeatherModelsUseCase
+import com.example.theweather.domain.usecase.GetWeatherListByCityUseCase
 import com.example.theweather.utils.TemperatureUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
 
 class WeatherByCityListViewModel(
     private val getSavedWeatherModelsUseCase: GetSavedWeatherModelsUseCase,
     private val getCurrentTemperatureUnitsTypeUseCase: GetCurrentTemperatureUnitsTypeUseCase,
-    private val selectedWeatherProvider: SelectedWeatherProvider
+    private val selectedWeatherProvider: SelectedWeatherProvider,
+    private val getWeatherListByCityUseCase: GetWeatherListByCityUseCase
 ) : ViewModel() {
 
-    private var weatherListMutableLiveData = MutableLiveData<MutableList<WeatherList>>()
-    val weatherListLiveData: LiveData<MutableList<WeatherList>> = weatherListMutableLiveData
-    private val weatherLists = mutableListOf<WeatherList>()
-    private val weatherListByCity = mutableMapOf<String, WeatherList>()
 
-    init {
-        weatherListMutableLiveData.value = weatherLists
-    }
+    private val weatherLists = mutableListOf<WeatherList>()
+    private val weatherListModelByCity = mutableMapOf<String, WeatherList>()
+    private var weatherListsMutableLiveData =
+        MutableLiveData<List<WeatherList>>(weatherLists)
+    val weatherListsLiveData: LiveData<List<WeatherList>> = weatherListsMutableLiveData
+
 
     fun getCurrentTemperatureUnitsType(): LiveData<TemperatureUtils.TemperatureUnitsType> =
         getCurrentTemperatureUnitsTypeUseCase.execute()
 
-    suspend fun getWeatherModels(): LiveData<List<WeatherModel>> {
-        val models = coroutineScope {
-            async(Dispatchers.IO) {
-                getSavedWeatherModelsUseCase.execute()
-            }
-        }
-
-        return models.await()
+    fun getWeatherModels(): LiveData<List<WeatherModel>> {
+        return getSavedWeatherModelsUseCase.execute()
     }
 
-    fun updateWeatherLists(weatherModels: List<WeatherModel>) {
-        weatherListByCity.clear()
-        weatherLists.clear()
+    fun updateData(weatherModels: List<WeatherModel>) {
+        weatherListModelByCity.clear()
 
         for (weatherModel in weatherModels) {
-            addWeatherModel(weatherModel)
+            val cityName = weatherModel.city
+            if (weatherListModelByCity.contains(cityName))
+                continue
+
+            weatherListModelByCity[cityName] = getWeatherListByCityUseCase.execute(cityName)
         }
 
-        val selectedModel = weatherModels.minByOrNull { it.dateTime }
+        val selectedModel = weatherModels.maxByOrNull { it.dateTime }
         selectedModel?.let { selectedWeatherProvider.setSelectedWeatherModel(it) }
         onWeatherListChangedNotify()
     }
 
-    private fun addWeatherModel(weatherModel: WeatherModel) {
-        val cityName = weatherModel.city
-
-        if (!weatherListByCity.containsKey(cityName)) {
-            val weatherList = WeatherList()
-            weatherListByCity[cityName] = weatherList
-            weatherLists.add(weatherList)
-        }
-
-        weatherListByCity[cityName]?.addModel(weatherModel)
-    }
 
     private fun onWeatherListChangedNotify() {
-        weatherListMutableLiveData.value = weatherLists;
+        weatherLists.clear()
+        weatherLists.addAll(weatherListModelByCity.values)
+        weatherListsMutableLiveData.value = weatherLists
     }
 
 
     class Factory @Inject constructor(
         private val getSavedWeatherModelsUseCase: GetSavedWeatherModelsUseCase,
         private val getCurrentTemperatureUnitsTypeUseCase: GetCurrentTemperatureUnitsTypeUseCase,
-        private val selectedWeatherProvider: SelectedWeatherProvider
+        private val selectedWeatherProvider: SelectedWeatherProvider,
+        private val getWeatherListByCityUseCase: GetWeatherListByCityUseCase
     ) :
         ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return WeatherByCityListViewModel(
                 getSavedWeatherModelsUseCase,
                 getCurrentTemperatureUnitsTypeUseCase,
-                selectedWeatherProvider
+                selectedWeatherProvider,
+                getWeatherListByCityUseCase
             ) as T;
         }
     }
