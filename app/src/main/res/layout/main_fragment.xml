@@ -7,8 +7,16 @@
     android:layout_height="match_parent"
     tools:context=".presentation.mainFragment.MainFragment">
 
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/autocomplete_fragment"
+        android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <include
-        android:id="@+id/toolBar"
+        android:id="@+id/toolBarLayout"
         layout="@layout/custom_tool_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,7 +31,7 @@
         android:background="?attr/colorSecondary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolBar" />
+        app:layout_constraintTop_toBottomOf="@+id/toolBarLayout" />
 
     <TextView
         android:id="@+id/cityTextView"
@@ -35,7 +43,7 @@
         android:textColor="?attr/colorOnSecondary"
         android:textSize="@dimen/city_names_text_size"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolBar" />
+        app:layout_constraintTop_toBottomOf="@+id/toolBarLayout" />
 
 
     <include
@@ -44,13 +52,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
+        android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="@+id/temperatureMainView"
-        app:layout_constraintStart_toStartOf="@+id/temperatureMainView"
-        app:layout_constraintTop_toBottomOf="@+id/cityTextView" />
+        app:layout_constraintStart_toStartOf="@+id/temperatureMainView" />
 
 
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/unitsSwitch"
+        app:trackTint="?attr/colorPrimary"
+        app:thumbTint="?attr/colorOnPrimary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="@+id/celsiusUnitsTextView"
@@ -73,10 +83,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="24dp"
+        android:layout_marginBottom="8dp"
         android:text="@string/celsius"
         android:textColor="?attr/colorOnSecondary"
         android:textSize="@dimen/unit_names_text_size"
-        app:layout_constraintBottom_toBottomOf="@+id/temperatureTextView"
+        app:layout_constraintBottom_toBottomOf="@+id/temperatureMainView"
         app:layout_constraintEnd_toEndOf="parent" />
 
 
@@ -92,6 +103,9 @@
         app:layout_constraintTop_toBottomOf="@+id/temperatureMainView"
         app:navGraph="@navigation/cities_list_navigation"
         tools:layout="@layout/weather_by_city_list_fragment" />
+
+
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

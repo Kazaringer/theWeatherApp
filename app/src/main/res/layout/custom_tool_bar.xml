@@ -9,22 +9,37 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="end">
+        android:layout_gravity="start">
 
         <ImageButton
-            android:id="@+id/searchImageButton"
+            android:id="@+id/backImageButton"
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:background="?android:selectableItemBackground"
-            android:src="@drawable/ic_search_black_24dp"
-            android:contentDescription="search" />
+            android:contentDescription="back"
+            android:src="@drawable/ic_arrow_back_black_24dp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end">
+
+        <ImageButton
+            android:id="@+id/searchLocationImageButton"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:background="?android:selectableItemBackground"
+            android:contentDescription="search"
+            android:src="@drawable/ic_search_black_24dp" />
 
         <ImageButton
             android:id="@+id/nearMeImageButton"
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:background="?android:selectableItemBackground"
-            android:src="@drawable/ic_near_me_black_24dp"
-            android:contentDescription="nearMe" />
+            android:contentDescription="nearMe"
+            android:src="@drawable/ic_near_me_black_24dp" />
     </LinearLayout>
 </Toolbar>

@@ -13,4 +13,6 @@ interface WeatherRepository {
         latitude: Double,
         longitude: Double
     ): WeatherModel
+
+    suspend fun getCurrentWeatherModelByCoordinates(cityName: String): WeatherModel
 }

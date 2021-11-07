@@ -1,7 +1,6 @@
 package com.example.theweather.utils
 
 import java.math.RoundingMode
-import java.text.DecimalFormat
 
 class TemperatureUtils {
     enum class TemperatureUnitsType {
@@ -11,9 +10,7 @@ class TemperatureUtils {
     companion object {
         fun fahrenheitToCelsius(temperature: Double): Double {
             val celsius = ((temperature - 32) * 5) / 9
-            val df = DecimalFormat("#.##")
-            df.roundingMode = RoundingMode.CEILING
-            return df.format(celsius).toDouble()
+            return celsius.toBigDecimal().setScale(1, RoundingMode.UP).toDouble()
         }
     }
 }

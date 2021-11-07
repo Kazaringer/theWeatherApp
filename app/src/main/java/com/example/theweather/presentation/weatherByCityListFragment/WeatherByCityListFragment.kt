@@ -42,7 +42,7 @@ class WeatherByCityListFragment @Inject constructor() :
     }
 
     private fun findViews(view: View) {
-        recyclerView = view.findViewById(R.id.weatherRecycleView)
+        recyclerView = view.findViewById(R.id.recycleView)
     }
 
     private fun observeViewModel() {

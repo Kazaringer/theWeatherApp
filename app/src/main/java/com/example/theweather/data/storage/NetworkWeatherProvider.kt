@@ -1,9 +1,17 @@
 package com.example.theweather.data.storage
 
+import android.os.Debug
 import com.example.theweather.data.services.NetworkWeatherService
 import com.example.theweather.data.storage.Models.NetworkModels.NetworkWeatherModel
 import com.example.theweather.data.storage.Models.WeatherModel
+import com.example.theweather.utils.DebugConsole
 import com.example.theweather.utils.TemperatureUtils
+import com.google.android.play.core.tasks.Task
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.await
+import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -19,6 +27,16 @@ class NetworkWeatherProvider @Inject constructor(private val networkWeatherServi
             lon = longitude,
             apiKey = API_KEY
         )
+
+        return convertModels(networkModel)
+    }
+
+    override suspend fun getModelByCityName(cityName: String): WeatherModel {
+        val networkModel = networkWeatherService.getCurrentWeather(
+            cityName = cityName,
+            apiKey = API_KEY
+        )
+
         return convertModels(networkModel)
     }
 

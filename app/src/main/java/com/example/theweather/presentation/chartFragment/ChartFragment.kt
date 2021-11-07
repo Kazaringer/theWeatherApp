@@ -2,24 +2,17 @@ package com.example.theweather.presentation.chartFragment
 
 import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.example.theweather.R
-import com.example.theweather.data.storage.Models.NetworkModels.Weather
-import com.example.theweather.domain.models.WeatherList
 import com.example.theweather.domain.models.WeatherModel
-import com.example.theweather.domain.usecase.GetWeatherListByCityUseCase
+import com.example.theweather.presentation.MainActivity
 import com.example.theweather.presentation.applicationComponent
-import com.example.theweather.presentation.weatherByCityListFragment.WeatherByCityListViewModel
-import com.example.theweather.presentation.weatherByCityListFragment.WeatherRecycleViewAdapter
 import com.example.theweather.utils.TemperatureUtils
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.data.DataSet
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
@@ -71,6 +64,8 @@ class ChartFragment @Inject constructor() : Fragment(R.layout.chart_fragment) {
         lineChart?.setDoubleTapToZoomEnabled(false)
         lineChart?.getLegend()?.setEnabled(false)
         lineChart?.getDescription()?.setEnabled(false)
+        // lineChart?.setBackgroundColor(R.attr.colorPrimary)
+        //lineChart?.setBorderColor(R.attr.colorPrimaryVariant)
 
         val xAxis = lineChart?.xAxis
         xAxis?.position = XAxis.XAxisPosition.BOTTOM
@@ -98,6 +93,14 @@ class ChartFragment @Inject constructor() : Fragment(R.layout.chart_fragment) {
             return
 
         val dataSet = LineDataSet(entries, "");
+
+        dataSet.setDrawFilled(true)
+        dataSet.setDrawCircles(false)
+        dataSet.setDrawValues(false)
+
+        dataSet.fillColor = R.attr.colorPrimaryVariant
+        dataSet.color = R.attr.colorPrimary
+
         val data = LineData(dataSet)
         lineChart?.data = data
         lineChart?.invalidate()
@@ -129,11 +132,12 @@ class ChartFragment @Inject constructor() : Fragment(R.layout.chart_fragment) {
         fahrenheitEntries.clear()
 
         val firstWeatherModel = weatherModels.minByOrNull { it.dateTime }
-        var minTime = 0f
-        firstWeatherModel?.let { minTime = it.dateTime.time.toFloat() }
+        var minTime = 0L
+
+        firstWeatherModel?.let { minTime = it.dateTime.time }
 
         for (weather in weatherModels) {
-            val x = (weather.dateTime.time - minTime)
+            val x = (weather.dateTime.time - minTime).toFloat()
             val yCelsius = weather.temperatureCelsius.toFloat()
             val yFahrenheit = weather.temperatureFahrenheit.toFloat()
 

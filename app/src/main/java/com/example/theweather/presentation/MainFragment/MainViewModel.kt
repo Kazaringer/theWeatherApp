@@ -5,6 +5,7 @@ import com.example.theweather.domain.controllers.SelectedWeatherProvider
 import com.example.theweather.domain.models.WeatherModel
 import com.example.theweather.domain.usecase.AddNewWeatherModelUseCase
 import com.example.theweather.domain.usecase.ChangeCurrentTemperatureUnitsTypeUseCase
+import com.example.theweather.domain.usecase.GetCurrentWeatherModelByCityUseCase
 import com.example.theweather.domain.usecase.GetCurrentWeatherModelUseCase
 import com.example.theweather.utils.DebugConsole
 import com.example.theweather.utils.TemperatureUtils
@@ -15,6 +16,7 @@ import javax.inject.Inject
 
 class MainViewModel constructor(
     private val getCurrentWeatherModelByCoordinatesUseCase: GetCurrentWeatherModelUseCase,
+    private val getCurrentWeatherModelByCityUseCase: GetCurrentWeatherModelByCityUseCase,
     private val addNewWeatherModelUseCase: AddNewWeatherModelUseCase,
     private val changeCurrentTemperatureUnitsTypeUseCase: ChangeCurrentTemperatureUnitsTypeUseCase,
     private val selectedWeatherProvider: SelectedWeatherProvider
@@ -30,6 +32,20 @@ class MainViewModel constructor(
         changeCurrentTemperatureUnitsTypeUseCase.execute(TemperatureUtils.TemperatureUnitsType.FAHRENHEIT)
     }
 
+    fun getWeatherByCityName(cityName: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val currentWeather = getCurrentWeatherAsync(cityName)
+                addWeatherToStorage(currentWeather)
+            } catch (exception: Exception) {
+                DebugConsole.error(
+                    this,
+                    exception.message ?: "getWeatherByCityName: something went wrong!"
+                )
+            }
+        }
+    }
+
     fun getWeatherByCoordinates(latitude: Double, longitude: Double) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -38,7 +54,7 @@ class MainViewModel constructor(
             } catch (exception: Exception) {
                 DebugConsole.error(
                     this,
-                    exception.message ?: "getCurrentWeather: something went wrong!"
+                    exception.message ?: "getWeatherByCoordinates: something went wrong!"
                 )
             }
         }
@@ -46,9 +62,24 @@ class MainViewModel constructor(
 
     private suspend fun getCurrentWeatherAsync(latitude: Double, longitude: Double): WeatherModel {
 
-        val model = viewModelScope.async(Dispatchers.IO) { getCurrentWeatherModelByCoordinatesUseCase.execute(latitude,longitude) }
+        val model = viewModelScope.async(Dispatchers.IO) {
+            getCurrentWeatherModelByCoordinatesUseCase.execute(
+                latitude,
+                longitude
+            )
+        }
         return model.await()
     }
+
+    private suspend fun getCurrentWeatherAsync(cityName: String): WeatherModel {
+        val model = viewModelScope.async(Dispatchers.IO) {
+            getCurrentWeatherModelByCityUseCase.execute(
+                cityName
+            )
+        }
+        return model.await()
+    }
+
 
     private fun addWeatherToStorage(weatherModel: WeatherModel) {
         addNewWeatherModelUseCase.execute(weatherModel)
@@ -57,14 +88,17 @@ class MainViewModel constructor(
 
     class Factory @Inject constructor(
         private val getCurrentWeatherModelUseCase: GetCurrentWeatherModelUseCase,
+        private val getCurrentWeatherModelByCityUseCase: GetCurrentWeatherModelByCityUseCase,
         private val addNewWeatherModelUseCase: AddNewWeatherModelUseCase,
         private val changeCurrentTemperatureUnitsTypeUseCase: ChangeCurrentTemperatureUnitsTypeUseCase,
         private val selectedWeatherProvider: SelectedWeatherProvider
+
     ) :
         ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return MainViewModel(
                 getCurrentWeatherModelUseCase,
+                getCurrentWeatherModelByCityUseCase,
                 addNewWeatherModelUseCase,
                 changeCurrentTemperatureUnitsTypeUseCase,
                 selectedWeatherProvider

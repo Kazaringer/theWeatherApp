@@ -4,4 +4,5 @@ import com.example.theweather.data.storage.Models.WeatherModel
 
 interface CurrentWeatherProvider {
     suspend fun getModelByCoordinates(latitude: Double, longitude: Double): WeatherModel
+    suspend fun getModelByCityName(cityName: String): WeatherModel
 }

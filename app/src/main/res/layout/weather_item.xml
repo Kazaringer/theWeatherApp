@@ -31,7 +31,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="24dp"
-        android:background="@null"
+        android:background="?android:selectableItemBackground"
         app:layout_constraintBottom_toBottomOf="@+id/splitterView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"

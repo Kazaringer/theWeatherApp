@@ -3,4 +3,6 @@
 
     <string name="fahrenheit">F</string>
     <string name="celsius">C</string>
+
+    <string name="welcome_text">Let"'"s check the weather!</string>
 </resources>

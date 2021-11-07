@@ -67,8 +67,9 @@ class WeatherRecycleViewAdapter @AssistedInject constructor(
     override fun onBindViewHolder(holder: WeatherViewHolder, position: Int) {
         val data = dataSet[position]
         val weatherPreview = data.preview;
+        val view = holder.itemView
 
-        weatherPreview.observe(holder.itemView.context as LifecycleOwner, {
+        weatherPreview.observe(view.context as LifecycleOwner, {
             holder.cityAndFahrenheitTextView?.text = "${it.city}, ${it.temperatureFahrenheit}°F"
             holder.cityAndCelsiusTextView?.text = "${it.city}, ${it.temperatureCelsius}°C"
             holder.dateTextView?.text = "${dateFormat.format(it.dateTime)}"
@@ -79,18 +80,26 @@ class WeatherRecycleViewAdapter @AssistedInject constructor(
             else -> holder.setFahrenheitView()
         }
 
-        setupButtons(holder.itemView, data)
+        setupButtons(view, data)
         viewHolders.add(holder)
     }
 
     private fun setupButtons(view: View, weatherList: WeatherList) {
         val chartButton = view.findViewById<ImageButton>(R.id.chartButton)
+
         chartButton.setOnClickListener {
             val action =
                 WeatherByCityListFragmentDirections.actionWeatherByCityListFragmentToChartFragment(
                     weatherList.cityName
                 )
             navController.navigate(action)
+        }
+
+        val models = weatherList.weatherModels.value
+        if (models == null || models.size <= 1) {
+            chartButton.visibility = View.GONE
+        } else {
+            chartButton.visibility = View.VISIBLE
         }
     }
 
