@@ -59,13 +59,13 @@
 
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/unitsSwitch"
-        app:trackTint="?attr/colorPrimary"
-        app:thumbTint="?attr/colorOnPrimary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="@+id/celsiusUnitsTextView"
         app:layout_constraintEnd_toStartOf="@+id/celsiusUnitsTextView"
-        app:layout_constraintTop_toTopOf="@+id/celsiusUnitsTextView" />
+        app:layout_constraintTop_toTopOf="@+id/celsiusUnitsTextView"
+        app:thumbTint="?attr/colorOnPrimary"
+        app:trackTint="?attr/colorPrimary" />
 
     <TextView
         android:id="@+id/fahrenheitUnitsTextView"
@@ -104,8 +104,15 @@
         app:navGraph="@navigation/cities_list_navigation"
         tools:layout="@layout/weather_by_city_list_fragment" />
 
-
-
+    <androidx.core.widget.ContentLoadingProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminateTint="?attr/colorPrimary"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolBarLayout" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

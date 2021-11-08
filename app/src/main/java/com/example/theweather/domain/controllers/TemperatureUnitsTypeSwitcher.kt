@@ -8,7 +8,6 @@ import javax.inject.Singleton
 
 @Singleton
 class TemperatureUnitsTypeSwitcher @Inject constructor() {
-
     private val currentTemperatureUnitsType =
         MutableLiveData(TemperatureUtils.TemperatureUnitsType.FAHRENHEIT)
 

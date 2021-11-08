@@ -1,14 +1,16 @@
 package com.example.theweather.presentation.chartFragment
 
 import android.content.Context
+import android.graphics.Color
+import android.graphics.Paint
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageButton
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.example.theweather.R
 import com.example.theweather.domain.models.WeatherModel
-import com.example.theweather.presentation.MainActivity
 import com.example.theweather.presentation.applicationComponent
 import com.example.theweather.utils.TemperatureUtils
 import com.github.mikephil.charting.charts.LineChart
@@ -26,32 +28,47 @@ class ChartFragment @Inject constructor() : Fragment(R.layout.chart_fragment) {
     private val viewModel: ChartViewModel by viewModels() { viewModelFactory.get() }
     private val args: ChartFragmentArgs by navArgs()
     private var lineChart: LineChart? = null
+    private var backButton: ImageButton? = null
 
     private val celsiusEntries: ArrayList<Entry> = ArrayList()
     private val fahrenheitEntries: ArrayList<Entry> = ArrayList()
 
-
-    private var currentTemperatureUnitsType: TemperatureUtils.TemperatureUnitsType =
-        TemperatureUtils.TemperatureUnitsType.FAHRENHEIT
+    private var currentTemperatureUnitsType = TemperatureUtils.TemperatureUnitsType.FAHRENHEIT
 
     private val entries: ArrayList<Entry>
         get() = when (currentTemperatureUnitsType) {
-            TemperatureUtils.TemperatureUnitsType.CELSIUS ->
-                celsiusEntries
-            else ->
-                fahrenheitEntries
+            TemperatureUtils.TemperatureUnitsType.CELSIUS -> celsiusEntries
+            else -> fahrenheitEntries
         }
-
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         context.applicationComponent.inject(this)
     }
 
+    override fun onDetach() {
+        super.onDetach()
+        hideBackButton()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupGraphView(view)
         observeViewModel()
+        setupBackButton()
+    }
+
+    private fun setupBackButton() {
+        backButton = requireActivity().findViewById(R.id.backImageButton)
+        showBackButton()
+    }
+
+    private fun showBackButton() {
+        backButton?.visibility = View.VISIBLE
+    }
+
+    private fun hideBackButton() {
+        backButton?.visibility = View.GONE
     }
 
     private fun setupGraphView(view: View) {
@@ -63,9 +80,10 @@ class ChartFragment @Inject constructor() : Fragment(R.layout.chart_fragment) {
         lineChart?.setPinchZoom(false)
         lineChart?.setDoubleTapToZoomEnabled(false)
         lineChart?.getLegend()?.setEnabled(false)
-        lineChart?.getDescription()?.setEnabled(false)
-        // lineChart?.setBackgroundColor(R.attr.colorPrimary)
-        //lineChart?.setBorderColor(R.attr.colorPrimaryVariant)
+        //lineChart?.getDescription()?.setEnabled(false)
+        lineChart?.description?.textSize = 15f
+        lineChart?.description?.textColor = Color.BLACK
+        lineChart?.description?.textAlign = Paint.Align.RIGHT
 
         val xAxis = lineChart?.xAxis
         xAxis?.position = XAxis.XAxisPosition.BOTTOM
@@ -103,6 +121,12 @@ class ChartFragment @Inject constructor() : Fragment(R.layout.chart_fragment) {
 
         val data = LineData(dataSet)
         lineChart?.data = data
+
+        val minValue = entries.minByOrNull { it.y }
+        val maxValue = entries.maxByOrNull { it.y }
+
+        lineChart?.description?.text = "Min temp: ${minValue?.y}, Max temp: ${maxValue?.y}"
+
         lineChart?.invalidate()
     }
 
@@ -119,9 +143,7 @@ class ChartFragment @Inject constructor() : Fragment(R.layout.chart_fragment) {
     private fun observeCurrentTemperatureUnitsType() {
         viewModel.getCurrentTemperatureUnitsType().observe(viewLifecycleOwner, {
             when (it) {
-                TemperatureUtils.TemperatureUnitsType.CELSIUS -> {
-                    switchToCelsius()
-                }
+                TemperatureUtils.TemperatureUnitsType.CELSIUS -> switchToCelsius()
                 else -> switchToFahrenheit()
             }
         })

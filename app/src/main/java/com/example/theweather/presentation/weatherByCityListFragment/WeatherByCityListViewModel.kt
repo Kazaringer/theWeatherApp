@@ -20,13 +20,10 @@ class WeatherByCityListViewModel(
     private val getWeatherListByCityUseCase: GetWeatherListByCityUseCase
 ) : ViewModel() {
 
-
     private val weatherLists = mutableListOf<WeatherList>()
     private val weatherListModelByCity = mutableMapOf<String, WeatherList>()
-    private var weatherListsMutableLiveData =
-        MutableLiveData<List<WeatherList>>(weatherLists)
+    private var weatherListsMutableLiveData = MutableLiveData<List<WeatherList>>(weatherLists)
     val weatherListsLiveData: LiveData<List<WeatherList>> = weatherListsMutableLiveData
-
 
     fun getCurrentTemperatureUnitsType(): LiveData<TemperatureUtils.TemperatureUnitsType> =
         getCurrentTemperatureUnitsTypeUseCase.execute()
@@ -51,13 +48,11 @@ class WeatherByCityListViewModel(
         onWeatherListChangedNotify()
     }
 
-
     private fun onWeatherListChangedNotify() {
         weatherLists.clear()
         weatherLists.addAll(weatherListModelByCity.values)
         weatherListsMutableLiveData.value = weatherLists
     }
-
 
     class Factory @Inject constructor(
         private val getSavedWeatherModelsUseCase: GetSavedWeatherModelsUseCase,
@@ -72,8 +67,7 @@ class WeatherByCityListViewModel(
                 getCurrentTemperatureUnitsTypeUseCase,
                 selectedWeatherProvider,
                 getWeatherListByCityUseCase
-            ) as T;
+            ) as T
         }
     }
-
 }

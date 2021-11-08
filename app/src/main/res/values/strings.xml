@@ -1,8 +1,16 @@
 <resources>
     <string name="app_name">The weather</string>
 
+
+
     <string name="fahrenheit">F</string>
     <string name="celsius">C</string>
 
     <string name="welcome_text">Let"'"s check the weather!</string>
+
+    <string name="google_api_key">AIzaSyBv1nUCYpkb0x2_Lmrsh1CXKfkSRXOOFBc</string>
+
+    <string name="location_permission_error">Location permission was not granted!</string>
+    <string name="weather_error">Failed to get weather data!</string>
+
 </resources>

@@ -1,6 +1,5 @@
 package com.example.theweather.domain.models
 
-import java.io.Serializable
 import java.util.*
 
 data class WeatherModel(

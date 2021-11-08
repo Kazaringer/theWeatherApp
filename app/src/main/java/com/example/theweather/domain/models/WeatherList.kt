@@ -2,9 +2,6 @@ package com.example.theweather.domain.models
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import com.example.theweather.data.storage.Models.NetworkModels.Weather
-import java.io.Serializable
 
 class WeatherList {
 
@@ -22,7 +19,6 @@ class WeatherList {
     private val weatherModelsMutable: MutableLiveData<List<WeatherModel>> =
         MutableLiveData<List<WeatherModel>>(weatherModelsCache)
     val weatherModels: LiveData<List<WeatherModel>> = weatherModelsMutable
-
 
     fun addModel(weatherModel: WeatherModel) {
         if (previewMutable.value == null || previewMutable.value!!.dateTime < weatherModel.dateTime)

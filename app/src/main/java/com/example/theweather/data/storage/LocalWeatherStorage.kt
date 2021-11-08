@@ -30,14 +30,10 @@ class LocalWeatherStorage @Inject constructor(
                     .findAll()
                     .map { convertModels(realmWeatherModel = it) })
         }
-
-
         return weatherModels
     }
 
     override suspend fun set(weatherModel: WeatherModel) {
-
-
         realm.executeTransactionAwait(coroutineContext) { realmTransaction ->
             realmTransaction.insert(convertModels(weatherModel = weatherModel))
         }

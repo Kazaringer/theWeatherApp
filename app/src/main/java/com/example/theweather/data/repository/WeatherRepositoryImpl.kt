@@ -44,7 +44,6 @@ class WeatherRepositoryImpl @Inject constructor(
             return@coroutineScope isLoaded
         }
 
-
     private fun cacheModel(weatherModel: com.example.theweather.data.storage.Models.WeatherModel) {
         val convertedModel = convertModels(weatherModel);
 
@@ -61,7 +60,6 @@ class WeatherRepositoryImpl @Inject constructor(
     override fun getLocalWeatherModels(): LiveData<List<WeatherModel>> {
         return weatherListLiveData;
     }
-
 
     override fun saveLocalWeatherModel(weatherModel: WeatherModel) {
         val storageWeatherModel = convertModels(weatherModel)

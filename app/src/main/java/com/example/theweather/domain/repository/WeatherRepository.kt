@@ -10,9 +10,7 @@ interface WeatherRepository {
     fun saveLocalWeatherModel(weatherModel: WeatherModel)
     fun getLocalWeatherList(city: String): WeatherList
     suspend fun getCurrentWeatherModelByCoordinates(
-        latitude: Double,
-        longitude: Double
+        latitude: Double, longitude: Double
     ): WeatherModel
-
     suspend fun getCurrentWeatherModelByCoordinates(cityName: String): WeatherModel
 }

@@ -22,3 +22,4 @@ val Context.applicationComponent: ApplicationComponent
         is MainApplication -> applicationComponent
         else -> this.applicationContext.applicationComponent
     }
+

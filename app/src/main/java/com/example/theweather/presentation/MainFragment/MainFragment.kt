@@ -2,8 +2,10 @@ package com.example.theweather.presentation.mainFragment
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
+import android.location.Location
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageButton
@@ -11,43 +13,38 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
 import com.example.theweather.R
 import com.example.theweather.domain.models.WeatherModel
 import com.example.theweather.presentation.applicationComponent
 import com.example.theweather.utils.DebugConsole
+import com.example.theweather.utils.RequestStatus
+import com.example.theweather.utils.Resource
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.api.model.TypeFilter
 import com.google.android.libraries.places.widget.Autocomplete
+import com.google.android.libraries.places.widget.AutocompleteActivity
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.google.android.material.switchmaterial.SwitchMaterial
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
-import android.app.Activity.RESULT_OK
-import android.view.LayoutInflater
-import android.view.ViewGroup
-import com.google.android.libraries.places.api.model.TypeFilter
-import com.google.android.libraries.places.widget.AutocompleteActivity
-import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.FragmentContainerView
-import androidx.fragment.app.FragmentManager
-import androidx.navigation.NavController
-import androidx.navigation.NavDestination
-import androidx.navigation.fragment.findNavController
 
 
-class MainFragment @Inject constructor() : Fragment(R.layout.main_fragment),
-    FragmentManager.OnBackStackChangedListener {
+class MainFragment @Inject constructor() : Fragment(R.layout.main_fragment) {
     private val HIGH_VALUE = 25.0
     private val MIDDLE_RANGE = 10.0
-
 
     @Inject
     lateinit var viewModelFactory: MainViewModel.Factory
@@ -63,17 +60,17 @@ class MainFragment @Inject constructor() : Fragment(R.layout.main_fragment),
     private var temperatureMainView: View? = null
     private var locationTokenSource: CancellationTokenSource? = null
     private var temperatureTextView: View? = null
+    private var nearMeImageButton: ImageButton? = null
+    private var findCityButton: ImageButton? = null
     private var backButton: ImageButton? = null
+    private var progressView: View? = null
 
     private val checkPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) {
             if (it) {
-                lifecycleScope.launch { getWeatherByCoordinates() }
+                getWeatherByCoordinates()
             } else {
-                Toast.makeText(
-                    requireActivity(), "location permission was not granted",
-                    Toast.LENGTH_SHORT
-                ).show()
+                getLocationPermissionErrorToast()
             }
         }
 
@@ -82,14 +79,13 @@ class MainFragment @Inject constructor() : Fragment(R.layout.main_fragment),
             when (result.resultCode) {
                 RESULT_OK -> {
                     val place = result.data?.let { Autocomplete.getPlaceFromIntent(it) }
-                    place?.name?.let { viewModel.getWeatherByCityName(it) }
+                    onGetPlaceSuccess(place)
                 }
+
                 AutocompleteActivity.RESULT_ERROR -> {
                     val status = result.data?.let { it1 -> Autocomplete.getStatusFromIntent(it1) }
-                    status?.statusMessage?.let { DebugConsole.error(this, it) }
-                }
-                else -> {
-                    DebugConsole.error(this, "canceled")
+                    status?.statusMessage?.let { DebugConsole.error(message = it) }
+                    getWeatherErrorToast()
                 }
             }
         }
@@ -100,8 +96,6 @@ class MainFragment @Inject constructor() : Fragment(R.layout.main_fragment),
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
     }
 
-
-    var fragmentContainerView: FragmentContainerView? = null
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupToolBar(view)
@@ -111,15 +105,6 @@ class MainFragment @Inject constructor() : Fragment(R.layout.main_fragment),
         setupUnitsSwitcher(view)
         setupTopButtons(view)
         observeViewModel()
-        fragmentContainerView = view.findViewById(R.id.secondary_navigation_host_fragment)
-        childFragmentManager.addOnBackStackChangedListener(this)
-
-    }
-
-    override fun onDestroyView() {
-         super.onDestroyView()
-        fragmentContainerView.onchange
-        childFragmentManager.addOnBackStackChangedListener(this)
     }
 
     private fun setupBackButton(view: View) {
@@ -129,8 +114,21 @@ class MainFragment @Inject constructor() : Fragment(R.layout.main_fragment),
         }
     }
 
+    private fun onGetPlaceSuccess(place: Place?) {
+        if (place == null || place.name.isNullOrEmpty()) {
+            getWeatherErrorToast()
+            return
+        }
+
+        observeWeatherRequest(viewModel.getWeatherByCityName(place.name!!))
+        showProgressBar()
+    }
+
     private fun setupToolBar(view: View) {
-        (requireActivity() as AppCompatActivity?)?.setSupportActionBar(view.findViewById(R.id.toolBar))
+        val actionBar = view.findViewById<Toolbar>(R.id.customToolBar)
+        val mainActivity = (requireActivity() as AppCompatActivity?) ?: return
+        mainActivity.setSupportActionBar(actionBar)
+        mainActivity.supportActionBar?.setDisplayShowTitleEnabled(false);
     }
 
     private fun getWeatherByCityName() {
@@ -149,24 +147,67 @@ class MainFragment @Inject constructor() : Fragment(R.layout.main_fragment),
         getPlaceLauncher.launch(intent)
     }
 
-    @SuppressLint("MissingPermission")
-    private suspend fun getWeatherByCoordinates() {
-        val cts = CancellationTokenSource()
+    private fun getWeatherByCoordinates() {
+        showProgressBar()
+        lifecycleScope.launch() {
+            val locationDef = async { getLocation() }
+            val location = locationDef.await()
 
-        locationTokenSource?.cancel()
+            if (location == null) {
+                hideProgressBar()
+                getWeatherErrorToast()
+                return@launch
+            }
 
-        var location =
-            fusedLocationClient!!.getCurrentLocation(PRIORITY_BALANCED_POWER_ACCURACY, cts.token)
-                .await()
-
-        if (location == null)
-            location = fusedLocationClient!!.lastLocation.await()
-
-        location?.let {
-            viewModel.getWeatherByCoordinates(location.latitude, location.longitude)
+            observeWeatherRequest(
+                viewModel.getWeatherByCoordinates(location.latitude, location.longitude)
+            )
         }
     }
 
+    @SuppressLint("MissingPermission")
+    private suspend fun getLocation(): Location? {
+        locationTokenSource?.cancel()
+        locationTokenSource = CancellationTokenSource()
+
+        val token = locationTokenSource!!.token
+        var location =
+            fusedLocationClient?.getCurrentLocation(PRIORITY_BALANCED_POWER_ACCURACY, token)
+                ?.await()
+
+        if (location == null)
+            location = fusedLocationClient?.lastLocation?.await()
+
+        return location
+    }
+
+    private fun observeWeatherRequest(weatherRequest: LiveData<Resource<WeatherModel>>) {
+        weatherRequest.observe(viewLifecycleOwner, {
+
+            if (it.status == RequestStatus.ERROR) {
+                getWeatherErrorToast()
+            }
+
+            if (it.status != RequestStatus.LOADING) {
+                hideProgressBar()
+            }
+        })
+    }
+
+    private fun getLocationPermissionErrorToast() {
+        val text = resources.getString(R.string.location_permission_error)
+        showToast(text)
+    }
+
+    private fun getWeatherErrorToast() {
+        val text = resources.getString(R.string.weather_error)
+        showToast(text)
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(requireActivity(), message, Toast.LENGTH_SHORT)
+            .show()
+    }
 
     private fun updateColor(weatherModel: WeatherModel) {
         if (temperatureMainView == null)
@@ -175,7 +216,6 @@ class MainFragment @Inject constructor() : Fragment(R.layout.main_fragment),
         val color = getColor(weatherModel)
         temperatureMainView?.setBackgroundColor(color)
     }
-
 
     private fun getColor(weatherModel: WeatherModel): Int {
         val temperature = weatherModel.temperatureCelsius
@@ -192,18 +232,17 @@ class MainFragment @Inject constructor() : Fragment(R.layout.main_fragment),
     }
 
     private fun setupTopButtons(view: View) {
-        val nearMeImageButton = view.findViewById<ImageButton>(R.id.nearMeImageButton)
-        val findCityButton = view.findViewById<ImageButton>(R.id.searchLocationImageButton)
+        nearMeImageButton = view.findViewById<ImageButton>(R.id.nearMeImageButton)
+        findCityButton = view.findViewById<ImageButton>(R.id.searchLocationImageButton)
 
-        nearMeImageButton.setOnClickListener {
+        nearMeImageButton?.setOnClickListener {
             checkPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
 
-        findCityButton.setOnClickListener {
+        findCityButton?.setOnClickListener {
             getWeatherByCityName()
         }
     }
-
 
     private fun findViews(view: View) {
         temperatureCelsiusText = view.findViewById(R.id.temperatureCelsiusTextView)
@@ -211,6 +250,7 @@ class MainFragment @Inject constructor() : Fragment(R.layout.main_fragment),
         cityText = view.findViewById(R.id.cityTextView)
         temperatureMainView = view.findViewById(R.id.temperatureMainView)
         temperatureTextView = view.findViewById(R.id.temperatureTextView)
+        progressView = view.findViewById(R.id.progressBar)
     }
 
     private fun switchToCelsius() {
@@ -262,11 +302,15 @@ class MainFragment @Inject constructor() : Fragment(R.layout.main_fragment),
         temperatureTextView?.visibility = View.VISIBLE
     }
 
+    private fun showProgressBar() {
+        progressView?.visibility = View.VISIBLE
+        nearMeImageButton?.isEnabled = false
+        findCityButton?.isEnabled = false
+    }
 
-    override fun onBackStackChanged() {
-        if (childFragmentManager.backStackEntryCount > 1)
-            backButton?.visibility = View.VISIBLE
-        else
-            backButton?.visibility = View.GONE
+    private fun hideProgressBar() {
+        progressView?.visibility = View.GONE
+        nearMeImageButton?.isEnabled = true
+        findCityButton?.isEnabled = true
     }
 }

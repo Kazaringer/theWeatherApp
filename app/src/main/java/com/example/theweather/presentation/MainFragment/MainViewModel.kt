@@ -1,17 +1,19 @@
 package com.example.theweather.presentation.mainFragment
 
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.liveData
+import androidx.lifecycle.viewModelScope
 import com.example.theweather.domain.controllers.SelectedWeatherProvider
 import com.example.theweather.domain.models.WeatherModel
 import com.example.theweather.domain.usecase.AddNewWeatherModelUseCase
 import com.example.theweather.domain.usecase.ChangeCurrentTemperatureUnitsTypeUseCase
 import com.example.theweather.domain.usecase.GetCurrentWeatherModelByCityUseCase
 import com.example.theweather.domain.usecase.GetCurrentWeatherModelUseCase
-import com.example.theweather.utils.DebugConsole
+import com.example.theweather.utils.Resource
 import com.example.theweather.utils.TemperatureUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class MainViewModel constructor(
@@ -32,36 +34,39 @@ class MainViewModel constructor(
         changeCurrentTemperatureUnitsTypeUseCase.execute(TemperatureUtils.TemperatureUnitsType.FAHRENHEIT)
     }
 
-    fun getWeatherByCityName(cityName: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val currentWeather = getCurrentWeatherAsync(cityName)
-                addWeatherToStorage(currentWeather)
-            } catch (exception: Exception) {
-                DebugConsole.error(
-                    this,
-                    exception.message ?: "getWeatherByCityName: something went wrong!"
+    fun getWeatherByCityName(cityName: String) = liveData(Dispatchers.IO) {
+        emit(Resource.loading(data = null))
+        try {
+            val currentWeather = getCurrentWeatherAsync(cityName)
+            addWeatherToStorage(currentWeather)
+            emit(Resource.success(data = currentWeather))
+        } catch (exception: Exception) {
+            emit(
+                Resource.error(
+                    data = null,
+                    message = exception.message ?: "getWeatherByCoordinates: something went wrong!"
                 )
-            }
+            )
         }
     }
 
-    fun getWeatherByCoordinates(latitude: Double, longitude: Double) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val currentWeather = getCurrentWeatherAsync(latitude, longitude)
-                addWeatherToStorage(currentWeather)
-            } catch (exception: Exception) {
-                DebugConsole.error(
-                    this,
-                    exception.message ?: "getWeatherByCoordinates: something went wrong!"
+    fun getWeatherByCoordinates(latitude: Double, longitude: Double) = liveData(Dispatchers.IO) {
+        emit(Resource.loading(data = null))
+        try {
+            val currentWeather = getCurrentWeatherAsync(latitude, longitude)
+            addWeatherToStorage(currentWeather)
+            emit(Resource.success(data = currentWeather))
+        } catch (exception: Exception) {
+            emit(
+                Resource.error(
+                    data = null,
+                    message = exception.message ?: "getWeatherByCoordinates: something went wrong!"
                 )
-            }
+            )
         }
     }
 
     private suspend fun getCurrentWeatherAsync(latitude: Double, longitude: Double): WeatherModel {
-
         val model = viewModelScope.async(Dispatchers.IO) {
             getCurrentWeatherModelByCoordinatesUseCase.execute(
                 latitude,
@@ -80,11 +85,9 @@ class MainViewModel constructor(
         return model.await()
     }
 
-
     private fun addWeatherToStorage(weatherModel: WeatherModel) {
         addNewWeatherModelUseCase.execute(weatherModel)
     }
-
 
     class Factory @Inject constructor(
         private val getCurrentWeatherModelUseCase: GetCurrentWeatherModelUseCase,
@@ -102,7 +105,7 @@ class MainViewModel constructor(
                 addNewWeatherModelUseCase,
                 changeCurrentTemperatureUnitsTypeUseCase,
                 selectedWeatherProvider
-            ) as T;
+            ) as T
         }
     }
 }

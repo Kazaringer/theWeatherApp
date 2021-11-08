@@ -58,9 +58,7 @@ class WeatherByCityListFragment @Inject constructor() :
 
         viewModel.getCurrentTemperatureUnitsType().observe(viewLifecycleOwner, {
             when (it) {
-                TemperatureUtils.TemperatureUnitsType.CELSIUS -> {
-                    switchToCelsius()
-                }
+                TemperatureUtils.TemperatureUnitsType.CELSIUS -> switchToCelsius()
                 else -> switchToFahrenheit()
             }
         })
@@ -81,6 +79,7 @@ class WeatherByCityListFragment @Inject constructor() :
 
     private fun setupRecycleView() {
         recyclerView?.layoutManager = LinearLayoutManager(context)
+
         if (adapter != null)
             recyclerView?.adapter = adapter
     }

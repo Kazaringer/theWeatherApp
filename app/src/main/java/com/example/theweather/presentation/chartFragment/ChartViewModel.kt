@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.theweather.domain.controllers.SelectedWeatherProvider
-import com.example.theweather.domain.models.WeatherList
 import com.example.theweather.domain.models.WeatherModel
 import com.example.theweather.domain.usecase.GetCurrentTemperatureUnitsTypeUseCase
 import com.example.theweather.domain.usecase.GetWeatherListByCityUseCase
@@ -38,7 +37,7 @@ class ChartViewModel(
                 getCurrentTemperatureUnitsTypeUseCase,
                 getWeatherListByCityUseCase,
                 selectedWeatherProvider
-            ) as T;
+            ) as T
         }
     }
 }

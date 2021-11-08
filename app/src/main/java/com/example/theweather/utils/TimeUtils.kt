@@ -1,14 +1,18 @@
 package com.example.theweather.utils
 
-import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.*
 
 class TimeUtils {
     companion object {
+        private val dateFormat = SimpleDateFormat("dd/M/yyyy hh:mm:ss")
+
         fun timestampToDateString(timestamp: Long): String {
-            val dateFormat = SimpleDateFormat("dd/M/yyyy \n hh:mm:ss")
-            return dateFormat.format(timestampToDate(timestamp))
+            return timestampToDateString(timestampToDate(timestamp))
+        }
+
+        fun timestampToDateString(date: Date): String {
+            return dateFormat.format(date)
         }
 
         fun timestampToDate(timestamp: Long): Date {
