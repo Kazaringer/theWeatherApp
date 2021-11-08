@@ -11,6 +11,6 @@
     <string name="google_api_key">AIzaSyBv1nUCYpkb0x2_Lmrsh1CXKfkSRXOOFBc</string>
 
     <string name="location_permission_error">Location permission was not granted!</string>
-    <string name="weather_error">Failed to get weather data!</string>
+    <string name="weather_error">Failed to get weather data! Check gps and internet connection enabled!</string>
 
 </resources>
