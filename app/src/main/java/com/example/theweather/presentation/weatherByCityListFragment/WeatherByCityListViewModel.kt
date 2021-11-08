@@ -10,13 +10,14 @@ import com.example.theweather.domain.models.WeatherModel
 import com.example.theweather.domain.usecase.GetCurrentTemperatureUnitsTypeUseCase
 import com.example.theweather.domain.usecase.GetSavedWeatherModelsUseCase
 import com.example.theweather.domain.usecase.GetWeatherListByCityUseCase
+import com.example.theweather.domain.usecase.SelectWeatherUseCase
 import com.example.theweather.utils.TemperatureUtils
 import javax.inject.Inject
 
 class WeatherByCityListViewModel(
     private val getSavedWeatherModelsUseCase: GetSavedWeatherModelsUseCase,
     private val getCurrentTemperatureUnitsTypeUseCase: GetCurrentTemperatureUnitsTypeUseCase,
-    private val selectedWeatherProvider: SelectedWeatherProvider,
+    private val selectWeatherUseCase: SelectWeatherUseCase,
     private val getWeatherListByCityUseCase: GetWeatherListByCityUseCase
 ) : ViewModel() {
 
@@ -44,7 +45,7 @@ class WeatherByCityListViewModel(
         }
 
         val selectedModel = weatherModels.maxByOrNull { it.dateTime }
-        selectedModel?.let { selectedWeatherProvider.setSelectedWeatherModel(it) }
+        selectedModel?.let { selectWeatherUseCase.execute(it) }
         onWeatherListChangedNotify()
     }
 
@@ -57,7 +58,7 @@ class WeatherByCityListViewModel(
     class Factory @Inject constructor(
         private val getSavedWeatherModelsUseCase: GetSavedWeatherModelsUseCase,
         private val getCurrentTemperatureUnitsTypeUseCase: GetCurrentTemperatureUnitsTypeUseCase,
-        private val selectedWeatherProvider: SelectedWeatherProvider,
+        private val selectWeatherUseCase: SelectWeatherUseCase,
         private val getWeatherListByCityUseCase: GetWeatherListByCityUseCase
     ) :
         ViewModelProvider.Factory {
@@ -65,7 +66,7 @@ class WeatherByCityListViewModel(
             return WeatherByCityListViewModel(
                 getSavedWeatherModelsUseCase,
                 getCurrentTemperatureUnitsTypeUseCase,
-                selectedWeatherProvider,
+                selectWeatherUseCase,
                 getWeatherListByCityUseCase
             ) as T
         }

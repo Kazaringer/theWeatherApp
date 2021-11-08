@@ -6,10 +6,7 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.example.theweather.domain.controllers.SelectedWeatherProvider
 import com.example.theweather.domain.models.WeatherModel
-import com.example.theweather.domain.usecase.AddNewWeatherModelUseCase
-import com.example.theweather.domain.usecase.ChangeCurrentTemperatureUnitsTypeUseCase
-import com.example.theweather.domain.usecase.GetCurrentWeatherModelByCityUseCase
-import com.example.theweather.domain.usecase.GetCurrentWeatherModelUseCase
+import com.example.theweather.domain.usecase.*
 import com.example.theweather.utils.Resource
 import com.example.theweather.utils.TemperatureUtils
 import kotlinx.coroutines.Dispatchers
@@ -21,10 +18,10 @@ class MainViewModel constructor(
     private val getCurrentWeatherModelByCityUseCase: GetCurrentWeatherModelByCityUseCase,
     private val addNewWeatherModelUseCase: AddNewWeatherModelUseCase,
     private val changeCurrentTemperatureUnitsTypeUseCase: ChangeCurrentTemperatureUnitsTypeUseCase,
-    private val selectedWeatherProvider: SelectedWeatherProvider
+    private val getSelectedWeatherUseCase: GetSelectedWeatherUseCase
 ) :
     ViewModel() {
-    val selectedWeatherModel = selectedWeatherProvider.getSelectedWeatherModel()
+    val selectedWeatherModel = getSelectedWeatherUseCase.execute()
 
     fun switchToCelsius() {
         changeCurrentTemperatureUnitsTypeUseCase.execute(TemperatureUtils.TemperatureUnitsType.CELSIUS)
@@ -94,7 +91,7 @@ class MainViewModel constructor(
         private val getCurrentWeatherModelByCityUseCase: GetCurrentWeatherModelByCityUseCase,
         private val addNewWeatherModelUseCase: AddNewWeatherModelUseCase,
         private val changeCurrentTemperatureUnitsTypeUseCase: ChangeCurrentTemperatureUnitsTypeUseCase,
-        private val selectedWeatherProvider: SelectedWeatherProvider
+        private val getSelectedWeatherUseCase: GetSelectedWeatherUseCase
 
     ) :
         ViewModelProvider.Factory {
@@ -104,7 +101,7 @@ class MainViewModel constructor(
                 getCurrentWeatherModelByCityUseCase,
                 addNewWeatherModelUseCase,
                 changeCurrentTemperatureUnitsTypeUseCase,
-                selectedWeatherProvider
+                getSelectedWeatherUseCase
             ) as T
         }
     }

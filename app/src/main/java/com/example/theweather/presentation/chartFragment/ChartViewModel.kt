@@ -6,14 +6,16 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.theweather.domain.controllers.SelectedWeatherProvider
 import com.example.theweather.domain.models.WeatherModel
 import com.example.theweather.domain.usecase.GetCurrentTemperatureUnitsTypeUseCase
+import com.example.theweather.domain.usecase.GetSelectedWeatherUseCase
 import com.example.theweather.domain.usecase.GetWeatherListByCityUseCase
+import com.example.theweather.domain.usecase.SelectWeatherUseCase
 import com.example.theweather.utils.TemperatureUtils
 import javax.inject.Inject
 
 class ChartViewModel(
     private val getCurrentTemperatureUnitsTypeUseCase: GetCurrentTemperatureUnitsTypeUseCase,
     private val getWeatherListByCityUseCase: GetWeatherListByCityUseCase,
-    private val selectedWeatherProvider: SelectedWeatherProvider,
+    private val selectWeatherUseCase: SelectWeatherUseCase
 ) : ViewModel() {
 
     fun getCurrentTemperatureUnitsType(): LiveData<TemperatureUtils.TemperatureUnitsType> =
@@ -23,20 +25,20 @@ class ChartViewModel(
 
     fun onWeatherListUpdate(weatherModels: List<WeatherModel>) {
         val lastModel = weatherModels.maxByOrNull { it.dateTime }
-        lastModel?.let { selectedWeatherProvider.setSelectedWeatherModel(it) }
+        lastModel?.let { selectWeatherUseCase.execute(it) }
     }
 
     class Factory @Inject constructor(
         private val getCurrentTemperatureUnitsTypeUseCase: GetCurrentTemperatureUnitsTypeUseCase,
         private val getWeatherListByCityUseCase: GetWeatherListByCityUseCase,
-        private val selectedWeatherProvider: SelectedWeatherProvider,
+        private val selectWeatherUseCase: SelectWeatherUseCase
     ) :
         ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return ChartViewModel(
                 getCurrentTemperatureUnitsTypeUseCase,
                 getWeatherListByCityUseCase,
-                selectedWeatherProvider
+                selectWeatherUseCase
             ) as T
         }
     }
