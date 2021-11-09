@@ -185,6 +185,7 @@ class MainFragment @Inject constructor() : Fragment(R.layout.main_fragment) {
         weatherRequest.observe(viewLifecycleOwner, {
 
             if (it.status == RequestStatus.ERROR) {
+                DebugConsole.error(message = it.message!!)
                 getWeatherErrorToast()
             }
 
